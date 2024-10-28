@@ -3,9 +3,9 @@
 
 ## Este projeto foi feito com:
 
-* [Django 4.2.3](https://www.djangoproject.com/)
-* [Django-ninja](https://django-ninja.rest-framework.com/)
-* [AlpineJS](https://alpinejs.dev/)
+* [Django 4.2.3]
+* [Django-ninja]
+* [AlpineJS]
 
 ## Como rodar o projeto?
 
@@ -16,8 +16,8 @@
 * Rode as migrações.
 
 ```
-git clone https://github.com/rg3915/ordem-de-servico.git
-# git clone https://gitlab.com/rg3915/ordem-de-servico.git
+git clone https://github.com/IgorAugustoSilva/lavanderia-cachoeira.git
+# git clone https://github.com/IgorAugustoSilva/lavanderia-cachoeira.git
 cd ordem-de-servico
 
 python -m venv .venv
@@ -31,6 +31,3 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-=======
-# LavanderiaCachoeira
->>>>>>> c2142a41cd85be42db3e6a59f2ce9a251ff6f56f
