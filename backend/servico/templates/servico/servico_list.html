@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Catálogo de Serviços</h1>
+
+  <form id="searchForm">
+    <input
+      id="id_search"
+      name="search"
+      class="form-control"
+      type="text"
+      placeholder="Busca..."
+      autofocus
+    />
+    <button class="btn btn-primary mt-2" type="submit">Buscar</button>
+    <a href="{% url 'servico:servico_list' %}" class="btn btn-secondary mt-2">Limpar Filtro</a>
+  </form>
+
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h2>Todos os Serviços</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Serviço</th>
+            <th>Só Lavar</th>
+            <th>Lavar e Passar</th>
+            <th>Só Passar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for object in object_list %}
+            <tr>
+              <td>{{ object.titulo }}</td>
+              <td>{{ object.preco_only_view_lavar }}</td>
+              <td>{{ object.preco_only_view_lavarpassar }}</td>
+              <td>{{ object.preco_only_view_passar }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h2>Serviços Selecionados</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Pacotes</th>
+            <th>Só Lavar</th>
+            <th>Lavar e Passar</th>
+            <th>Só Passar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for object in object_list %}
+            {% if object.id in selected_ids %}
+              <tr>
+                <td>{{ object.titulo }}</td>
+                <td>{{ object.preco_only_view_lavar }}</td>
+                <td>{{ object.preco_only_view_lavarpassar }}</td>
+                <td>{{ object.preco_only_view_passar }}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block js %}
+  <script>
+    // Get the input field and form
+    var input = document.getElementById("id_search");
+    var form = document.getElementById("searchForm");
+
+    // Add event listener for keypress
+    input.addEventListener("keypress", function(event) {
+      if (event.keyCode === 13) {
+        event.preventDefault(); // Prevent form submission via Enter key
+        form.submit(); // Submit the form
+      }
+    });
+  </script>
+{% endblock js %}

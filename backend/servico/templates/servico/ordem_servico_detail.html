@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div style="margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 style="margin: 0;">OS {{ object }} - {{ object.cliente }}</h1>
+      <div class="signature-section" style="margin-top: 0; text-align: center;">
+        <!-- QR code insta para impressão -->
+        <img src="{% static 'images/instagram_qrcode.png' %}" alt="QR Code Instagram" class="print-logo" style="width: 100px;">
+        <p style="margin-top: 1px; font-size: 14px;">Instagram: @lavanderia.cachoeira</p>
+      </div>
+    </div>
+  </div>
+
+
+  <a href="{% url 'servico:ordem_servico_list' %}" class="btn btn-link mb-3 no-print">Voltar</a>
+
+  <!-- Botão de Impressão -->
+  <button onclick="window.print()" class="btn btn-primary mb-3 no-print" style="float: right;">Imprimir OS</button>
+
+  <!-- Informações do Cliente e Endereço -->
+  <div class="client-info">
+    <div class="client-header">
+      <div class="client-item"><strong>Nome:</strong> {{ object.cliente.nome }}</div>
+      {% if object.cliente.CPF %}
+        <div class="client-item"><strong>CPF:</strong> {{ object.cliente.CPF }}</div>
+      {% endif %}
+      {% if object.cliente.telefone %}
+        <div class="client-item"><strong>Telefone:</strong> {{ object.cliente.telefone }}</div>
+      {% else %}
+        <div class="client-item"><strong>Telefone:</strong> Nenhum telefone cadastrado</div>
+      {% endif %}
+    </div>
+      <div class="client-address">
+        <div class="address-item">
+          <strong>Endereço:</strong> {{ object.cliente.get_full_address }}
+        </div>
+      </div>
+
+      <div class="client-details">
+        <div class="client-item">
+          <strong>Data de coleta:</strong> {{ object.data_coleta|date:"d/m/Y" }}
+        </div>
+        <div class="client-item">
+          <strong>Entrega:</strong> {% if object.deliver == 'sim' %}Sim{% else %}Não{% endif %}
+        </div>
+      </div>
+
+  <style>
+    .client-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .client-header {
+      margin-bottom: 10px;
+    }
+
+    .client-details {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .client-address, .client-delivery {
+      margin-right: 10px;
+    }
+  </style>
+
+
+  <div style="height: 20px;"></div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Serviço</th>
+        <th style="text-align: center;">Tipo</th>
+        <th style="text-align: center;">Quantidade</th>
+        <th style="text-align: center;">Valor Unitário</th>
+        <th style="text-align: center;">Valor Total</th>
+        <th style="text-align: center;">Observação</th>
+        <th style="text-align: center;" class="no-print">Previsão de entrega</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in object.ordem_servico_itens.all %}
+        <tr>
+          <td>{{ item.servico }}</td>
+          <td style="text-align: center;">{{ item.get_tipo_display }}</td>
+          <td style="text-align: center;">{{ item.quantidade_m2 }}</td>
+          <td style="text-align: center;">{{ item.valor }}</td>
+          <td style="text-align: center;">{{ item.get_valor_total_item }}</td>
+          <td style="text-align: center;">{{ item.observacao|default:"N/A" }}</td>
+          <td style="text-align: center;" class="no-print">{{ item.previsao_entrega|date:"d/m/Y"|default:"N/A" }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4" style="text-align: right;"><strong>Nenhum item encontrado.</strong></td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td></td>
+        <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+        <td colspan="4" style="text-align: left;"><strong>{{ object.get_valor_total_display }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Espaço para assinatura e forma de pagamento -->
+  <div class="signature-section" style="margin-top: 60px;">
+    <div style="text-align: center; margin-bottom: 5px;">
+      <!-- Assinatura centralizada -->
+      <p style="border-top: 1px solid #000; width: 300px; margin: 0 auto; padding-top: 5px; text-align: center;">
+        <!-- Logo para impressão -->
+        <img src="{% static 'images/Logo.jpeg' %}" alt="Logo" class="print-logo" style="display: inline-block; vertical-align: middle;">
+      </p>
+    </div>
+    <!-- Forma de Pagamento alinhada à esquerda e Finalizado alinhado à direita -->
+    <div style="display: flex; justify-content: space-between;">
+      <p style="margin: 0;"><strong>Forma de Pagamento:</strong> {{ object.get_pagamento_display }}</p>
+      <p style="margin: 0;"><strong>Finalizado:</strong> &nbsp;&nbsp;&nbsp; / &nbsp;&nbsp;&nbsp; /2024</p>
+    </div>
+  </div>
+
+
+  <style>
+    /* Visível apenas para a tela */
+    .signature-section {
+      display: none;
+    }
+
+    .client-info {
+      margin-top: 20px;
+    }
+
+    .client-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .client-item {
+      flex: 1;
+      margin-right: 10px;
+      box-sizing: border-box;
+    }
+
+    .client-address,
+    .client-date {
+      margin-bottom: 10px;
+    }
+
+    .address-item {
+      margin-bottom: 5px;
+    }
+
+    @media print {
+      /* Esconder elementos com a classe .no-print durante a impressão */
+      .no-print {
+        display: none;
+      }
+      
+      /* Mostrar a assinatura do responsável e informações do cliente apenas na impressão */
+      .signature-section,
+      .client-info {
+        display: block;
+      }
+
+      .client-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .client-item {
+        flex: 1;
+        margin-right: 10px;
+      }
+
+      .client-address {
+        margin-top: 10px;
+      }
+
+      .address-item {
+        margin-bottom: 5px;
+      }
+
+      .client-date {
+        margin-top: 10px;
+      }
+
+      /* Centralizar e melhorar o layout para impressão */
+      h1, table {
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .signature-section,
+      .client-info {
+        margin-top: 50px;
+        text-align: left;
+      }
+
+      /* Ajuste de margens e fontes para impressão */
+      body {
+        margin: 1cm;
+        font-size: 12pt;
+        line-height: 1.5;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th, td {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      /* Estilos adicionais */
+      .signature-section p,
+      .client-info p {
+        margin: 0;
+        padding-top: 20px;
+      }
+
+      .signature-section p:first-child,
+      .client-info p:first-child {
+        margin-top: 50px;
+      }
+      /* Logo para impressão */
+      .print-logo {
+        display: block;
+        width: 200px; /* Ajuste o tamanho conforme necessário */
+        margin: 0 auto;
+      }
+    }
+  </style>
+{% endblock content %}

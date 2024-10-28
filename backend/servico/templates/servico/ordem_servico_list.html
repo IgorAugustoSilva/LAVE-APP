@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="d-flex justify-content-between align-items-center">
+    Ordens de Serviço
+    <a
+      href="{% url 'servico:ordem_servico_create' %}"             
+      class="btn btn-primary"               
+    >Criar Ordem de Serviço</a>
+  </h1>
+
+  <!-- Formulário de exportação -->
+  <form method="GET" class="d-flex justify-content-between mb-4">
+    <div class="form-group d-flex">
+        <label for="data_inicio" class="mr-3">Data Início:</label>
+        <input type="date" id="data_inicio" name="data_inicio" class="form-control mr-2" value="{{ data_inicio }}">
+        
+        <label for="data_fim" class="mr-3">Data Fim:</label>
+        <input type="date" id="data_fim" name="data_fim" class="form-control mr-2" value="{{ data_fim }}">
+        
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+    <div>
+      {% if data_inicio and data_fim %}
+          <a href="{% url 'servico:export_ordem_servico' %}?data_inicio={{ data_inicio }}&data_fim={{ data_fim }}" class="btn btn-success">Exportar</a>
+      {% else %}
+          <button class="btn btn-success" disabled title="Obrigatório fazer a filtragem da data">Exportar</button>
+      {% endif %}
+  </div>
+  </form>
+
+  <!-- Filtro por situação -->
+  <div class="row">
+    <div class="col-sm-2">
+      <h3>Situação</h3>
+      <div class="list-group">
+        <a href="{% url 'servico:ordem_servico_list' %}" class="list-group-item list-group-item-action">
+          Limpar filtro
+        </a>
+        <a href="{% url 'servico:ordem_servico_list' %}?search=la" class="list-group-item list-group-item-action">
+          Lavando 
+        </a>
+        <a href="{% url 'servico:ordem_servico_list' %}?search=pc" class="list-group-item list-group-item-action">
+          Pendente coleta
+        </a>
+        <a href="{% url 'servico:ordem_servico_list' %}?search=pe" class="list-group-item list-group-item-action">
+          Pendente entrega
+        </a>
+        <a href="{% url 'servico:ordem_servico_list' %}?search=en" class="list-group-item list-group-item-action">
+          Entregue
+        </a>
+      </div>
+    </div>
+
+    <!-- Tabela de ordens de serviço -->
+    <div class="col-sm-10">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th style="text-align: center;">Ordem</th>
+            <th style="text-align: center;">Cliente</th>
+            <th style="text-align: center;">Situação</th>
+            <th style="text-align: center;">Valor Total</th>
+            <th style="text-align: center;">Data</th>
+            <th style="text-align: center;">Pagamento</th>
+            <th style="text-align: center;">Serviço de entrega?</th>
+            <th style="text-align: center;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for object in object_list %}
+            <tr>
+              <td style="text-align: center;">
+                <a href="{% url 'servico:ordem_servico_detail' object.pk %}">{{ object.pk }}</a>
+              </td>
+              <td style="text-align: center;">{{ object.cliente }}</td>
+              <td style="text-align: center;">{{ object.get_situacao_display }}</td>
+              <td style="text-align: center;">{{ object.get_valor_total_display }}</td>
+              <td style="text-align: center;">{{ object.data_coleta|date:"d/m/Y" }}</td>
+              <td style="text-align: center;">{{ object.get_pagamento_display }}</td>
+              <td style="text-align: center;">
+                <input type="checkbox" disabled 
+                       {% if object.deliver == 'sim' %}checked{% endif %} 
+                       class="form-check-input" 
+                       style="transform: scale(1.5); cursor: not-allowed;">
+              </td>
+              <td style="text-align: center;">
+                <a href="{% url 'servico:ordem_servico_update' object.pk %}">
+                  <i class="fa fa-edit"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}

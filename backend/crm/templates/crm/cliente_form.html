@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <div x-data>
+    <h1>{% if form.instance.pk %}Atualizar Cliente{% else %}Adicionar Cliente{% endif %}</h1>
+
+    <a
+      href="{% url 'crm:cliente_list' %}"
+      class="btn btn-link mb-3"
+    >Voltar</a>
+
+    <div class="row">
+      <div class="col-sm-4">
+        <form
+          action="."
+          method="POST"
+        >
+          {% csrf_token %}
+
+          {% for field in form.visible_fields %}
+            <div class="form-group">
+              <label for="{{ field.label }}">{{ field.label }}</label>
+              {% render_field field class="form-control" %}
+
+              {% if field.errors %}
+                {% for error in field.errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div class="mb-3"></div>
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >Salvar</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

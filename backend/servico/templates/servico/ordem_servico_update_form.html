@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
+{% endblock css %}
+
+{% block content %}
+  <h1>Atualizar Ordem de Serviço</h1>
+  <a href="{% url 'servico:ordem_servico_list' %}" class="btn btn-link mb-3">Voltar</a>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Cliente Autocomplete -->
+    <div class="form-group row autocomplete">
+      <label for="searchCliente" class="col-sm-2 col-form-label">Cliente</label>
+      <div class="col-sm-10">
+        <input type="text" id="searchCliente" class="form-control" placeholder="Cliente" 
+               x-model="searchCliente" x-init="searchCliente = '{{ form.instance.cliente.nome }}'">
+        <ul id="id_ul" x-show="clienteShow">
+          <template x-for="cliente in clientes" :key="cliente.id">
+            <li x-text="cliente.nome" @click="getCliente(cliente)"></li>
+          </template>
+        </ul>
+      </div>
+    </div>      
+
+    <!-- Entrega -->
+    <div class="form-group row">
+      <label class="col-sm-1 col-form-label">Entrega</label>
+      <div class="col-sm-2">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="deliver" id="id_deliver_sim" value="sim" {% if form.instance.deliver == 'sim' %}checked{% endif %}/>
+          <label class="form-check-label" for="id_deliver_sim">Sim</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="deliver" id="id_deliver_nao" value="nao" {% if form.instance.deliver == 'nao' %}checked{% endif %}/>
+          <label class="form-check-label" for="id_deliver_nao">Não</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Situação -->
+    <div class="form-group row">
+      <label for="id_situacao" class="col-sm-2 col-form-label">Situação</label>
+      <div class="col-sm-2">
+        {% render_field form.situacao class="form-control" %}
+      </div>
+    </div>
+
+    <!-- Pagamento -->
+    <div class="form-group row">
+      <label for="id_pagamento" class="col-sm-2 col-form-label">Pagamento</label>
+      <div class="col-sm-2">
+        {% render_field form.pagamento class="form-control" %}
+      </div>
+    </div>
+
+    <!-- Botão de Submissão -->
+    <div class="form-group row">
+      <div class="col-sm-10">
+        <button type="submit" class="btn btn-success">
+            Atualizar
+        </button>
+      </div>
+    </div>
+  </form>
+{% endblock content %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Detalhes do Cliente: {{ object.nome }}</h1>
+
+  <a
+    href="{% url 'crm:cliente_list' %}"
+    class="btn btn-link mb-3"
+  >Voltar</a>
+  <a
+    href="{% url 'crm:cliente_update' object.pk %}"
+    class="btn btn-primary mb-3"
+  >Atualizar</a>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="list-group">
+        <a
+          href="#"
+          class="list-group-item list-group-item-action flex-column align-items-start"
+        >
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">Dados</h5>
+          </div>
+          <div>
+            <p class="mb-1">{{ object.nome }}{% if object.CPF %}, CPF: {{ object.CPF }}{% endif %}
+            </p>
+            {% if  object.telefone %}
+              <p class="mb-1">Telefone: {{ object.telefone }}
+              </p>
+            {% endif %}
+            {% if object.rua or object.numero or object.bairro %}
+              <p class="mb-1">
+                {{ object.rua }}{% if object.numero %}, Número {{ object.numero }}{% endif %}{% if object.bairro %}, {{ object.bairro }}{% endif %}
+              </p>
+            {% endif %}
+            {% if object.cidade or object.uf %}
+              <p class="mb-1">
+                {{ object.cidade }}{% if object.uf %}, {{ object.uf }}{% endif %}
+              </p>
+            {% endif %}
+            {% if object.complemento %}
+              <p class="mb-1">{{ object.complemento }}</p>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
+{% endblock css %}
+
+{% block content %}
+  <div x-data="getData">
+    <!-- Título e Botões de Ação -->
+    <h1>Adicionar Ordem de Serviço</h1>
+    <a href="{% url 'servico:ordem_servico_list' %}" class="btn btn-link mb-3">Voltar</a>
+      <a href="{% url 'crm:cliente_create' %}" class="btn btn-link mb-3">Criar Novo Cliente</a>
+   
+
+    <!-- Formulário -->
+    <form method="post" @submit.prevent="saveData()">
+      {% csrf_token %}
+
+      <!-- Cliente Autocomplete -->
+      <div class="form-group row autocomplete" x-data @click.away="clienteShow = false">
+        <label for="searchCliente" class="col-sm-2 col-form-label">Cliente</label>
+        <div class="col-sm-10">
+          <input type="text" id="searchCliente" class="form-control" placeholder="Cliente" 
+                x-model="searchCliente" @blur="validateCliente">
+          <ul id="id_ul" x-show="clienteShow" style="position: absolute; background-color: white; z-index: 10;">
+            <template x-for="cliente in clientes" :key="cliente.id">
+              <li x-text="cliente.nome" @click="getCliente(cliente)" style="cursor: pointer;"></li>
+            </template>
+          </ul>
+          <!-- Mensagem de erro -->
+          <p class="text-danger" x-show="!clienteSelecionado.id && clienteError">Por favor, selecione um cliente.</p>
+        </div>
+      </div>
+
+      <!-- Data de Coleta e Entrega -->
+      <div class="form-group row">
+        <label for="id_data_coleta" class="col-sm-2 col-form-label">Data de coleta</label>
+        <div class="col-sm-2">
+          {% render_field form.data_coleta class="form-control" x-model="ordemServico.dataColeta" %}
+        </div>
+        <label class="col-sm-1 col-form-label">Entrega</label>
+        <div class="col-sm-2">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="deliver" id="id_deliver_sim" x-model="ordemServico.deliver" value="sim" required/>
+            <label class="form-check-label" for="id_deliver_sim">Sim</label>
+          </div>
+          <div class="form-check">
+           <input class="form-check-input" type="radio" name="deliver" id="id_deliver_nao" x-model="ordemServico.deliver" value="nao"/>
+           <label class="form-check-label" for="id_deliver_nao">Não</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Situação -->
+      <div class="form-group row">
+        <label for="id_situacao" class="col-sm-2 col-form-label">Situação</label>
+        <div class="col-sm-2">
+          {% render_field form.situacao class="form-control" x-model="ordemServico.situacao" %}
+        </div>
+      </div>
+
+        <!-- Serviço Autocomplete -->
+        <div class="form-group row autocomplete" x-data @click.away="servicoShow = false">
+          <label for="searchServico" class="col-sm-2 col-form-label">Serviço</label>
+          <div class="col-sm-4">
+            <input type="text" id="searchServico" class="form-control" placeholder="Serviço" 
+                  x-model="searchServico" @blur="validateServico">
+            <ul id="id_ul" x-show="servicoShow" style="position: absolute; background-color: white; z-index: 10;">
+              <template x-for="servico in servicos" :key="servico.id">
+                <li x-text="servico.titulo" @click="getServico(servico)" style="cursor: pointer;"></li>
+              </template>
+            </ul>
+            <!-- Mensagem de erro para serviço -->
+            <p class="text-danger" x-show="!servicoSelecionado.id && servicoError">Por favor, selecione um serviço.</p>
+          </div>
+        </div>
+
+        <!-- Tipo -->
+        <div class="form-group row">
+          <div class="col-sm-6 offset-sm-2">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="tipo" id="sl" value="sl" x-model="ordemServicoItem.tipo">
+              <label class="form-check-label" for="sl">Só lavar</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="tipo" id="lp" value="lp" x-model="ordemServicoItem.tipo">
+              <label class="form-check-label" for="lp">Lavar e passar</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="tipo" id="sp" value="sp" x-model="ordemServicoItem.tipo">
+              <label class="form-check-label" for="sp">Só passar</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="tipo" id="na" value="na" required x-model="ordemServicoItem.tipo">
+              <label class="form-check-label" for="na">Não se aplica</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quantidade -->
+        <div class="form-group row">
+          <label for="id_quantidade" class="col-sm-2 col-form-label">Quantidade</label>
+          <div class="col-sm-2">
+            {% render_field form.quantidade class="form-control" step="0.1" x-model="ordemServicoItem.quantidade" %}
+          </div>
+        </div>
+
+        <!-- Valor -->
+        <div class="form-group row">
+          <label for="id_valor" class="col-sm-2 col-form-label">Valor</label>
+          <div class="col-sm-2">
+            {% render_field form.valor class="form-control" step="1.00" x-model="ordemServicoItem.valor" %}
+          </div>
+        </div>
+
+        <!-- Observação -->
+        <div class="form-group row">
+          <label for="id_observacao" class="col-sm-2 col-form-label">Observação</label>
+          <div class="col-sm-10">
+            {% render_field form.observacao class="form-control" x-model="ordemServicoItem.observacao" %}
+          </div>
+        </div>
+
+        <!-- Previsão de Entrega -->
+        <div class="form-group row">
+          <label for="id_previsao_entrega" class="col-sm-2 col-form-label">Previsão de entrega</label>
+          <div class="col-sm-2">
+            {% render_field form.previsao_entrega class="form-control" x-model="ordemServicoItem.previsaoEntrega" %}
+          </div>
+        </div>
+
+      <!-- Pagamento -->
+      <div class="form-group row">
+        <label for="id_pagamento" class="col-sm-2 col-form-label">Pagamento</label>
+        <div class="col-sm-2">
+          {% render_field form.pagamento class="form-control" x-model="ordemServico.pagamento" %}
+        </div>
+      </div>
+
+        <div class="form-group row">
+          <div class="col-sm-10">
+            <button type="button" class="btn btn-primary" @click="addItem">Adicionar</button>
+          </div>
+        </div>
+
+      <!-- Botão de Submissão -->
+      <div class="form-group row">
+        <div class="col-sm-10">
+          <button type="submit" class="btn btn-success">
+            Salvar
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+      <!-- Tabela de Itens da Ordem de Serviço -->
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Descrição (Serviço)</th>
+            <th style="text-align: center;">Tipo</th>
+            <th style="text-align: center;">Quantidade</th>
+            <th style="text-align: center;">Valor</th>
+            <th style="text-align: center;">Observação</th>
+            <th style="text-align: center;">Prev de entrega</th>
+            <th style="text-align: center;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="item in ordemServicoItems" :key="item.id">
+            <tr>
+              <td x-text="item.servico_titulo"></td>
+              <td style="text-align: center;" x-text="item.tipo"></td>
+              <td style="text-align: center;" x-text="item.quantidade"></td>
+              <td style="text-align: center;" x-text="item.valor"></td>
+              <td style="text-align: center;" x-text="item.observacao"></td>
+              <td style="text-align: center;" x-text="item.previsao_entrega"></td>
+              <td class="text-primary" @click="deleteOrdemServicoItem(item.id)">Deletar</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+  </div>
+{% endblock content %}
+
+{% block js %}
+  <script src="{% static 'js/servico/servico.js' %}" data-csrf="{{ csrf_token }}"></script>
+{% endblock js %}
