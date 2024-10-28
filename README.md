@@ -1,6 +1,6 @@
 <<<<<<< HEAD
+
 # Lavanderia Cachoeira
-# Ordem de Serviço
 
 ## Este projeto foi feito com:
 
