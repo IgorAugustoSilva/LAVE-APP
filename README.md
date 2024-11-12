@@ -1,8 +1,6 @@
 <<<<<<< HEAD
 
-# Lavanderia Cachoeira
-
-## Este projeto foi feito com:
+# LAVE APP
 
 * [Django 4.2.3]
 * [Django-ninja]
