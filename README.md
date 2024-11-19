@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-
 # LAVE APP
-
-* [Django 4.2.3]
-* [Django-ninja]
-* [AlpineJS]
-
-## Como rodar o projeto?
 
 * Clone esse repositório.
 * Crie um virtualenv com Python 3.
